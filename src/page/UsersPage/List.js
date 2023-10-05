@@ -29,9 +29,13 @@ export default class List extends Component {
       return (
         <tr key={index}>
           <td>{user.id}</td>
+          <td>{user.name}</td>
           <td>{user.account}</td>
           <td>{user.password}</td>
-          <td>{user.name}</td>
+          <td>
+            <button className="btn btn-danger">Delete</button>
+            <button className="btn btn-warning">Edit</button>
+          </td>
         </tr>
       );
     });
@@ -40,7 +44,15 @@ export default class List extends Component {
     return (
       <div>
         <table className="table">
-          <thead></thead>
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Name</th>
+              <th>Account</th>
+              <th>Password</th>
+              <th>Action</th>
+            </tr>
+          </thead>
           <tbody>{this.handleRenderTable()}</tbody>
         </table>
       </div>
