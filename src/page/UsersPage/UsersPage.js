@@ -9,7 +9,7 @@ export default class UsersPage extends Component {
    */
   render() {
     return (
-      <div>
+      <div className="container">
         <Form />
         <List />
       </div>
