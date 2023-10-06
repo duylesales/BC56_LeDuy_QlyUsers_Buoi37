@@ -1,31 +1,23 @@
 import axios from "axios";
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import { SET_USER } from "../../redux/constant/user";
+import { setUserAction } from "../../redux/action/user";
+import { message } from "antd";
 
-export default class List extends Component {
+class List extends Component {
   // lấy tất cả, xoá, lấy chi tiết theo ID
 
   // renderUserList
   //1. Tạo 1 state chứa users
   //2. gọi api get all, rồi setState sau khi gọi thành công
   //3.Render hàm table user
-  state = {
-    users: [],
-  };
+
   componentDidMount() {
-    axios({
-      url: "https://651e9c4c44a3a8aa4768abf3.mockapi.io/users",
-      method: "GET",
-    })
-      .then((res) => {
-        this.setState({ users: res.data });
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    this.props.handleSetUser();
   }
   handleRenderTable = () => {
-    return this.state.users.map((user, index) => {
+    return this.props.users.reverse().map((user, index) => {
       return (
         <tr key={index}>
           <td>{user.id}</td>
@@ -33,12 +25,31 @@ export default class List extends Component {
           <td>{user.account}</td>
           <td>{user.password}</td>
           <td>
-            <button className="btn btn-danger">Delete</button>
+            <button
+              onClick={() => {
+                this.handleDelete(user.id);
+              }}
+              className="btn btn-danger"
+            >
+              Delete
+            </button>
             <button className="btn btn-warning">Edit</button>
           </td>
         </tr>
       );
     });
+  };
+  handleDelete = (id) => {
+    axios
+      .delete(`https://651e9c4c44a3a8aa4768abf3.mockapi.io/users/${id}`)
+      .then((res) => {
+        console.log(res);
+        message.success("Xóa thành công");
+        this.props.handleSetUser();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   render() {
     return (
@@ -59,3 +70,16 @@ export default class List extends Component {
     );
   }
 }
+let mapStateToProps = (state) => {
+  return {
+    users: state.userReducer.users,
+  };
+};
+let mapDispatchToProps = (dispatch) => {
+  return {
+    handleSetUser: () => {
+      dispatch(setUserAction());
+    },
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(List);

@@ -1,7 +1,10 @@
 import axios from "axios";
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import { SET_USER } from "../../redux/constant/user";
+import { setUserAction } from "../../redux/action/user";
 
-export default class Form extends Component {
+class Form extends Component {
   // chức năng thêm
   // 1. tạo state chứ input từ user
   // 2. gọi api với method POST, đưa data từ state lên server
@@ -28,6 +31,7 @@ export default class Form extends Component {
     })
       .then((res) => {
         console.log(res);
+        this.props.handleSetUser();
       })
       .catch((err) => {
         console.log(err);
@@ -73,3 +77,11 @@ export default class Form extends Component {
     );
   }
 }
+let mapDispatchToProps = (dispatch) => {
+  return {
+    handleSetUser: () => {
+      dispatch(setUserAction());
+    },
+  };
+};
+export default connect(null, mapDispatchToProps)(Form);
