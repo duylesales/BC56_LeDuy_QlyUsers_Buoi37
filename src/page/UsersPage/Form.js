@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { Component } from "react";
+import React, { Component, createRef } from "react";
 import { connect } from "react-redux";
 import { SET_USER } from "../../redux/constant/user";
 import { setUserAction } from "../../redux/action/user";
@@ -8,7 +8,13 @@ class Form extends Component {
   // chức năng thêm
   // 1. tạo state chứ input từ user
   // 2. gọi api với method POST, đưa data từ state lên server
-
+  componentDidMount() {
+    this.inputRef.current.focus();
+    this.inputRef.current.value = "defaultAccount";
+    this.inputRef.current.style.color = "red";
+  }
+  inputRef = createRef();
+  formRef = createRef();
   state = {
     user: {
       name: "",
@@ -31,6 +37,7 @@ class Form extends Component {
     })
       .then((res) => {
         console.log(res);
+        this.formRef.current.reset();
         this.props.handleSetUser();
       })
       .catch((err) => {
@@ -40,8 +47,9 @@ class Form extends Component {
   render() {
     return (
       <div>
-        <form className="form-inline">
+        <form ref={this.formRef} className="form-inline">
           <input
+            ref={this.inputRef}
             onChange={this.handleChangeForm}
             value={this.state.name}
             type="text"
