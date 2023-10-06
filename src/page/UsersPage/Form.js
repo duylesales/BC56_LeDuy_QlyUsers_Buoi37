@@ -1,8 +1,9 @@
 import axios from "axios";
 import React, { Component, createRef } from "react";
 import { connect } from "react-redux";
-import { SET_USER } from "../../redux/constant/user";
+import { SET_DATA_FORM, SET_USER } from "../../redux/constant/user";
 import { setUserAction } from "../../redux/action/user";
+import { message } from "antd";
 
 class Form extends Component {
   // chức năng thêm
@@ -15,25 +16,17 @@ class Form extends Component {
   }
   inputRef = createRef();
   formRef = createRef();
-  state = {
-    user: {
-      name: "",
-      account: "",
-      password: "",
-    },
-  };
+
   handleChangeForm = (event) => {
     let { value, name } = event.target;
-    let user = { ...this.state.user, [name]: value };
-    this.setState({
-      user: user,
-    });
+    let user = { ...this.props.user, [name]: value };
+    this.props.handleSetDataForm(user);
   };
   handleAddUser = () => {
     axios({
       url: "https://651e9c4c44a3a8aa4768abf3.mockapi.io/users",
       method: "POST",
-      data: this.state.user,
+      data: this.props.user,
     })
       .then((res) => {
         console.log(res);
@@ -44,6 +37,23 @@ class Form extends Component {
         console.log(err);
       });
   };
+  handleUpdateUser = (id) => {
+    axios({
+      url: `https://651e9c4c44a3a8aa4768abf3.mockapi.io/users/${id}`,
+      method: "PUT",
+      data: this.props.user,
+    })
+      .then((res) => {
+        console.log(res);
+        this.props.handleSetUser();
+        message.success("Cập nhập thành công");
+        this.formRef.current.reset();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   render() {
     return (
       <div>
@@ -51,7 +61,7 @@ class Form extends Component {
           <input
             ref={this.inputRef}
             onChange={this.handleChangeForm}
-            value={this.state.name}
+            value={this.props.user.name}
             type="text"
             class="form-control"
             name="name"
@@ -59,7 +69,7 @@ class Form extends Component {
           />
           <input
             onChange={this.handleChangeForm}
-            value={this.state.account}
+            value={this.props.user.account}
             type="text"
             class="form-control"
             name="account"
@@ -67,7 +77,7 @@ class Form extends Component {
           />
           <input
             onChange={this.handleChangeForm}
-            value={this.state.password}
+            value={this.props.user.password}
             type="text"
             class="form-control"
             name="password"
@@ -80,16 +90,36 @@ class Form extends Component {
           >
             Thêm
           </button>
+          <button
+            onClick={() => {
+              this.handleUpdateUser(this.props.user.id);
+            }}
+            type="button"
+            className="btn btn-secondary"
+          >
+            Cập nhập
+          </button>
         </form>
       </div>
     );
   }
 }
+let mapStateToProps = (state) => {
+  return {
+    user: state.userReducer.user,
+  };
+};
 let mapDispatchToProps = (dispatch) => {
   return {
     handleSetUser: () => {
       dispatch(setUserAction());
     },
+    handleSetDataForm: (user) => {
+      dispatch({
+        type: SET_DATA_FORM,
+        payload: user,
+      });
+    },
   };
 };
-export default connect(null, mapDispatchToProps)(Form);
+export default connect(mapStateToProps, mapDispatchToProps)(Form);
